@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSVP-Trisha_XVIII</title>
+    <!-- Import Google Fonts for the Bridgerton Regency Aesthetic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Playfair+Display:ital,wght@0,600;1,400&family=Cinzel:wght@500;700&family=Great+Vibes&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --blush-pink: #fbcbc9;
+            --soft-blush: #fdf2f0;
+            --cream-bg: rgba(255, 253, 249, 0.96); /* Semi-transparent ivory */
+            --gold-primary: #d4af37;
+            --gold-gradient: linear-gradient(135deg, #c5a059 0%, #f3e5ab 50%, #aa771c 100%);
+            --charcoal-text: #2c2523;
+            --border-color: #ecd5c5;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            /* Using the beautiful scenery illustration as a full background */
+            background-image: url('bridgerton_bg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: var(--charcoal-text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* The container card with an elegant classic border and soft transparent blur */
+        .rsvp-container {
+            background: var(--cream-bg);
+            backdrop-filter: blur(8px); /* Softly blurs the scenery behind the card */
+            -webkit-backdrop-filter: blur(8px);
+            padding: 45px 35px;
+            border-radius: 40px / 15px; /* Regency-era curved outline */
+            box-shadow: 0 20px 50px rgba(44, 37, 35, 0.15);
+            max-width: 480px;
+            width: 100%;
+            border: 2px solid var(--gold-primary);
+            outline: 6px double var(--cream-bg);
+            outline-offset: -8px;
+            box-sizing: border-box;
+            position: relative;
+            text-align: center;
+            /* Entrance animation for the card */
+            animation: cardEntrance 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Styles for your custom corner flowers */
+        .corner-flower {
+            position: absolute;
+            width: 90px; /* You can change this number to make your flowers bigger or smaller */
+            height: auto;
+            z-index: 10; /* Ensures the flower sits on top of the borders */
+            pointer-events: none; /* Allows clicks to pass through if it overlaps text boxes */
+            opacity: 0;
+            animation: photoFadeIn 1.2s ease 0.6s forwards;
+        }
+
+        /* Position Top-Left Flower */
+        .corner-flower-tl {
+            top: -22px;
+            left: -22px;
+        }
+
+        /* Position Top-Right Flower (Flips the image automatically so it faces the correct way) */
+        .corner-flower-tr {
+            top: -22px;
+            right: -22px;
+            transform: scaleX(-1); 
+        }
+
+        /* Horizontal/Landscape Photo Container */
+        .debutante-photo-container {
+            width: 100%;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--border-color);
+            opacity: 0;
+            transform: translateY(10px);
+            animation: photoFadeIn 1s ease 0.4s forwards;
+        }
+
+        .debutante-photo-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Regency Script accent at the top */
+        .regency-accent {
+            font-family: 'Great Vibes', cursive;
+            font-size: 28px;
+            color: #b38235;
+            margin-bottom: -5px;
+            opacity: 0.9;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-weight: 500;
+            font-size: 28px;
+            letter-spacing: 2px;
+            margin: 5px 0 5px;
+            color: var(--charcoal-text);
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 16px;
+            color: #72625d;
+            margin-bottom: 15px;
+            font-style: italic;
+            letter-spacing: 1px;
+        }
+
+        /* Golden Fleur-de-lis decorative divider */
+        .divider {
+            color: var(--gold-primary);
+            font-size: 20px;
+            margin: 0 auto 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            height: 1px;
+            width: 45px;
+            background: var(--gold-gradient);
+            display: inline-block;
+        }
+
+        /* Elegant Event Details Display */
+        .event-details {
+            font-family: 'Cormorant Garamond', serif;
+            margin: 15px 0 25px 0;
+            line-height: 1.6;
+        }
+
+        .event-details .detail-item {
+            margin-bottom: 12px;
+        }
+
+        .event-details strong {
+            font-family: 'Cinzel', serif;
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            color: var(--gold-primary);
+            display: block;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .event-details span {
+            font-size: 17px;
+            font-style: italic;
+            color: var(--charcoal-text);
+        }
+
+        .step {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .step.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-family: 'Cinzel', serif;
+            font-size: 12px;
+            letter-spacing: 1px;
+            color: var(--charcoal-text);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            background-color: #ffffff;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+            font-family: 'Cormorant Garamond', serif;
+            color: var(--charcoal-text);
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 5px rgba(212, 175, 55, 0.2);
+        }
+
+        /* Ornate gold-gradient buttons with a subtle glow on hover */
+        button {
+            width: 100%;
+            padding: 14px;
+            background: var(--gold-gradient);
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(170, 119, 28, 0.2);
+            transition: transform 0.2s, box-shadow 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(170, 119, 28, 0.35);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button:disabled {
+            background: #d8ceb9;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* Gold-outline styled Back to Invitation button */
+        .back-btn {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 24px;
+            border: 1px solid var(--gold-primary);
+            border-radius: 4px;
+            color: #b38235;
+            background-color: transparent;
+            font-family: 'Cinzel', serif;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+        }
+
+        .back-btn:hover {
+            background-color: var(--gold-primary);
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(170, 119, 28, 0.15);
+        }
+
+        .error-message {
+            color: #b05c50;
+            font-size: 15px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        /* RSVP Selection Grid */
+        .guest-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .guest-name {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .radio-options {
+            display: flex;
+            gap: 15px;
+        }
+
+        .radio-options label {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 16px;
+            margin: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        input[type="radio"] {
+            accent-color: var(--gold-primary);
+        }
+
+        .message-section {
+            margin-top: 25px;
+            display: none;
+            text-align: left;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            background-color: #ffffff;
+            border-radius: 4px;
+            resize: vertical;
+            box-sizing: border-box;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 16px;
+            color: var(--charcoal-text);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--gold-primary);
+        }
+
+        .summary-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .summary-list li {
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--border-color);
+            font-size: 17px;
+        }
+
+        /* Animations */
+        @keyframes cardEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.97);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes photoFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="rsvp-container">
+
+    <!-- CORNER FLOWERS (Save your custom image as "flower_corner.png") -->
+    <img src="top_flower.png" class="corner-flower corner-flower-tl" alt="">
+    <img src="bot_flower.png" class="corner-flower corner-flower-tr" alt="">
+    
+    <!-- Horizon Landscape Photo of Trisha Jia -->
+    <div class="debutante-photo-container">
+        <img src="trisha_jia.jpg" alt="Trisha Jia">
+    </div>
+
+    <!-- Bridgerton style cursive intro -->
+    <div class="regency-accent">You are invited to</div>
+    <h1>Trisha Jia</h1>
+    <div class="subtitle">A Decade & Eight</div>
+    
+    <!-- Fleur-de-lis divider -->
+    <div class="divider">⚜</div>
+
+    <!-- STEP 1: Name Search -->
+    <div id="step-search" class="step active">
+        
+        <!-- Elegant Date, Time, and Location block -->
+        <div class="event-details">
+            <div class="detail-item">
+                <strong>The Date & Time</strong>
+                <span>Sunday, July 5, 2026 <br> Guests are graciously requested to arrive at 5:30 PM</span>
+            </div>
+            <div class="detail-item">
+                <strong>The Place</strong>
+                <span>Great Eastern Hotel - Aberdeen Court</span>
+            </div>
+        </div>
+
+        <label for="search-name">Name of Honored Guest:</label>
+        <input type="text" id="search-name" placeholder="First & Last Name" autocomplete="off">
+        <div id="search-error" class="error-message">We cannot find this name on our list. Please try again.</div>
+        
+        <button onclick="findGuest()">Access Your Invitation</button>
+        
+        <!-- REPLACE "YOUR_PREVIEW_LINK_HERE" with your actual link -->
+        <a href="YOUR_PREVIEW_LINK_HERE" class="back-btn" style="margin-top: 15px; display: block; text-align: center;">Preview the Invitation</a>
+    </div>
+
+    <!-- STEP 2: Attendance Selection -->
+    <div id="step-attendance" class="step">
+        
+        <!-- TARGET POINTS TO THE HIDDEN IFRAME BELOW -->
+        <form id="rsvp-form" action="https://docs.google.com/forms/d/e/1FAIpQLSeCfImEsjExII0OnbL1U--V7GXlFhP0nbIhcpdXnJawZuExsQ/formResponse" method="POST" target="hidden_iframe" onsubmit="submitRSVP(event)">
+            
+            <!-- Real Google Form inputs hidden from the guest -->
+            <input type="hidden" name="entry.726538769" id="g-primary-guest">
+            <input type="hidden" name="entry.125082574" id="g-attending">
+            <input type="hidden" name="entry.905882131" id="g-declined">
+            <input type="hidden" name="entry.1935903853" id="g-message">
+
+            <div id="guest-list-container">
+                <!-- Guest rows generated dynamically -->
+            </div>
+
+            <div id="decline-message-section" class="message-section">
+                <label for="decline-message">A message for the Debutante:</label>
+                <!-- Removed "required" from HTML below so JavaScript handles it dynamically instead -->
+                <textarea id="decline-message" rows="4" placeholder="Share your warm well wishes..."></textarea>
+            </div>
+
+            <button type="submit" id="submit-btn" style="margin-top: 25px;">Submit Response</button>
+        </form>
+    </div>
+
+    <!-- STEP 3: Confirmation -->
+    <div id="step-confirmation" class="step">
+        <h2 style="font-family: 'Cinzel', serif; color: var(--gold-primary); font-size: 22px; margin-bottom: 5px;">Response Received</h2>
+        <p style="font-style: italic; color: #72625d; margin-bottom: 25px;">Your presence has been duly noted.</p>
+        <div id="rsvp-summary"></div>
+        
+        <!-- REPLACE "YOUR_LINK_HERE" with your actual invitation URL -->
+        <a href="YOUR_LINK_HERE" class="back-btn">Back to Invitation</a>
+    </div>
+</div>
+
+<!-- HIDDEN IFRAME FOR GOOGLE FORM ACTIONS -->
+<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+
+<script>
+    const guestDatabase = {
+    "adam vinzon": { type: "group", members: ["Adam Vinzon", "Caila Ruado"] },
+    "richard mortos, maine mortos": { type: "group", members: ["Richard Mortos", "Maine Mortos"] },
+    "rai ruado, marjorie ruado": { type: "group", members: ["Rai Ruado", "Marjorie Ruado"] },
+    "julius ruado, roma ruado": { type: "group", members: ["Julius Ruado", "Roma Ruado"] },
+    "rodolfo moncatar, rosalinda moncatar": { type: "group", members: ["Rodolfo Moncatar", "Rosalinda Moncatar"] },
+    "jacob moncatar, gab moncatar": { type: "group", members: ["Jacob Moncatar", "Gab Moncatar"] },
+    "jamie santander, badeth santander": { type: "group", members: ["Jamie Santander", "Badeth Santander"] },
+    "erika lagata, david lagata, elisa lagata": { type: "group", members: ["Erika Lagata", "David Lagata", "Elisa Lagata"] },
+    "kathleen papio, celsis ruado, carina ruado": { type: "group", members: ["Kathleen Papio", "Celsis Ruado", "Carina Ruado"] },
+    "wendy ruado, santino santiago, julia ruado": { type: "group", members: ["Wendy Ruado", "Santino Santiago", "Julia Ruado"] },
+    "monica rodriguez, khenjie rodriguez, vita ponce": { type: "group", members: ["Monica Rodriguez", "Khenjie Rodriguez", "Vita Ponce"] },
+    "janela dalangin, aurora dalangin, analiza caliboso, anita licas": { type: "group", members: ["Janela Dalangin", " Aurora Dalangin", "Analiza Caliboso", "Anita Licas"] },
+    "mercy laurenciano, pia laurenciano, jade laurenciano, hanah laurenciano": { type: "group", members: ["Mercy Laurenciano", "Pia Laurenciano", "Jade Laurenciano", "Hanah Laurenciano"] },
+    "marlo abaya, yen abaya, ashton abaya, fiona abaya, alexa abaya": { type: "group", members: ["Marlo Abaya", "Yen Abaya", "Ashton Abaya", "Fiona Abaya", "Alexa Abaya"] },
+    "lotlot ordelas, perla ordelas, jaja alviar, marj barnachea, +1 (for nanay)": { type: "group", members: ["Lotlot Ordelas", "Perla Ordelas", "Jaja Alviar", "Marj Barnachea", "1 (for nanay)"] },
+    "joseph ordelas, jinky ordelas, ashton ordelas, asha ordelas, asher ordelas": { type: "group", members: ["Joseph Ordelas", "Jinky Ordelas", "Ashton Ordelas", "Asha Ordelas", "Asher Ordelas"] },
+    "rita soriano, jing alviar, olive diza, cecille reyes, jon liban": { type: "group", members: ["Rita Soriano", "Jing Alviar", "Olive Diza", "Cecille Reyes", "Jon Liban"] },
+    "marlon ponce, mariza ponce, brando ponce, martha ponce, edward ponce": { type: "group", members: ["Marlon Ponce", "Mariza Ponce", "Brando Ponce", "Martha Ponce", "Edward Ponce"] },
+    "orly bustamante, lorena bustamante, oliver bustamante, anne bustamante, lorrenz bustamante, zandro bayani": { type: "group", members: ["Orly Bustamante", "Lorena Bustamante", "Oliver Bustamante", " Anne Bustamante", "Lorrenz Bustamante", "Zandro Bayani"] },
+    "criselda lopez, mar urbano, lilibeth yap, jun yap, pen escobar, marivic romero, arniza urbano": { type: "group", members: ["Criselda Lopez", "Mar Urbano", "Lilibeth Yap", "Jun Yap", "Pen Escobar", "Marivic Romero", "Arniza Urbano"] },
+    "angela labos, +1 guest": { type: "group", members: ["Angela Labos", "1 Guest"] },
+    "christian moncatar, +1 guest": { type: "group", members: ["Christian Moncatar", "1 Guest"] },
+    "richard fabella": { type: "group", members: ["Richard Fabella"] },
+    "nelia moncatar": { type: "group", members: ["Nelia Moncatar"] },
+    "yancy moncatar": { type: "group", members: ["Yancy Moncatar"] },
+    "jovy garcia": { type: "group", members: ["Jovy Garcia"] },
+    "bambi jagorin": { type: "group", members: ["Bambi Jagorin"] },
+    "aareca legazpi": { type: "group", members: ["Aareca Legazpi"] },
+    "miggy fadul": { type: "group", members: ["Miggy Fadul"] },
+    "amanda cortez": { type: "group", members: ["Amanda Cortez"] },
+    "andrei alcober": { type: "group", members: ["Andrei Alcober"] },
+    "nikkie dullate": { type: "group", members: ["Nikkie Dullate"] },
+    "jimuel angeles": { type: "group", members: ["Jimuel Angeles"] },
+    "elisse mangubat": { type: "group", members: ["Elisse Mangubat"] },
+    "jean pablo": { type: "group", members: ["Jean Pablo"] },
+    "aliane estevez": { type: "group", members: ["Aliane Estevez"] },
+    "cristina bola": { type: "group", members: ["Cristina Bola"] },
+    "anyah aquino": { type: "group", members: ["Anyah Aquino"] },
+    "trisha nicolas": { type: "group", members: ["Trisha Nicolas"] },
+    "ilegna regio": { type: "group", members: ["Ilegna Regio"] },
+    "tristan yap": { type: "group", members: ["Tristan Yap"] },
+    "cyrene ho": { type: "group", members: ["Cyrene Ho"] },
+    "alexandra paliza": { type: "group", members: ["Alexandra Paliza"] },
+    "marcuisha matthea": { type: "group", members: ["Marcuisha Matthea"] },
+    "harry bismonte": { type: "group", members: ["Harry Bismonte"] },
+    "alexander perilla": { type: "group", members: ["Alexander Perilla"] },
+    "aiden dela cruz": { type: "group", members: ["Aiden Dela Cruz"] },
+    "jun llanillo": { type: "group", members: ["Jun Llanillo"] },
+    "georcelle afable": { type: "group", members: ["Georcelle Afable"] },
+    "marko benson": { type: "group", members: ["Marko Benson"] },
+    "mariz de guzman": { type: "group", members: ["Mariz De Guzman"] },
+    "sean yalung": { type: "group", members: ["Sean Yalung"] },
+    "trisha lipago": { type: "group", members: ["Trisha Lipago"] },
+    "micah antiga": { type: "group", members: ["Micah Antiga"] },
+    "zyrrah bigayan": { type: "group", members: ["Zyrrah Bigayan"] },
+    "rafael reynes": { type: "group", members: ["Rafael Reynes"] },
+    "azad tayamora": { type: "group", members: ["Azad Tayamora"] },
+    "johann baligod": { type: "group", members: ["Johann Baligod"] },
+    "hannah gabuyo": { type: "group", members: ["Hannah Gabuyo"] },
+    };
+
+    let activeGuestData = null;
+    let mainSearchName = "";
+
+    function findGuest() {
+        const inputName = document.getElementById('search-name').value.trim().toLowerCase();
+        const errorDiv = document.getElementById('search-error');
+        
+        let foundKey = null;
+
+        if (inputName.length < 2) {
+            errorDiv.textContent = "Please enter at least 2 characters to search.";
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        // 1. Loop through the database keys and guest members list to find a match
+        for (const key in guestDatabase) {
+            const guestGroup = guestDatabase[key];
+            const members = guestGroup.members;
+
+            // Check if the search matches the group key (e.g. "adam vinzon")
+            if (key.toLowerCase().includes(inputName) || inputName.includes(key.toLowerCase())) {
+                foundKey = key;
+                break;
+            }
+
+            // Check if the search term matches any individual member's name inside the array
+            const matchesMember = members.some(member => {
+                const mClean = member.toLowerCase();
+                return mClean.includes(inputName) || inputName.includes(mClean);
+            });
+
+            if (matchesMember) {
+                foundKey = key;
+                break;
+            }
+        }
+
+        // If a match is found, load the attendance screen
+        if (foundKey) {
+            activeGuestData = guestDatabase[foundKey];
+            mainSearchName = foundKey; 
+            errorDiv.style.display = 'none';
+            setupRSVPForm(activeGuestData.members);
+            switchStep('step-attendance');
+        } else {
+            errorDiv.textContent = "We cannot find this name on our list. Please try again.";
+            errorDiv.style.display = 'block';
+        }
+    }
+
+    function setupRSVPForm(members) {
+        const container = document.getElementById('guest-list-container');
+        container.innerHTML = ''; 
+
+        members.forEach((member, index) => {
+            const row = document.createElement('div');
+            row.className = 'guest-row';
+            row.innerHTML = `
+                <div class="guest-name">${member}</div>
+                <div class="radio-options">
+                    <label>
+                        <input type="radio" name="attendance_${index}" value="attending" required onclick="checkAttendanceStatus()"> 
+                        Attending the Celebration
+                    </label>
+                    <label>
+                        <input type="radio" name="attendance_${index}" value="declined" required onclick="checkAttendanceStatus()"> 
+                        Unable to Join the Celebration
+                    </label>
+                </div>
+            `;
+            container.appendChild(row);
+        });
+    }
+
+    function checkAttendanceStatus() {
+        const radioButtons = document.querySelectorAll('#guest-list-container input[type="radio"]:checked');
+        let showMessageBox = false;
+
+        radioButtons.forEach(radio => {
+            if (radio.value === 'declined') {
+                showMessageBox = true;
+            }
+        });
+
+        const messageSection = document.getElementById('decline-message-section');
+        const messageInput = document.getElementById('decline-message');
+        
+        if (showMessageBox) {
+            messageSection.style.display = 'block';
+        } else {
+            messageSection.style.display = 'none';
+            messageInput.required = false; // Disable required so submission works when all attend
+            messageInput.value = ''; 
+        }
+    }
+
+    function submitRSVP(event) {
+        // Standard form submit targetting hidden iframe will run naturally
+        const submitBtn = document.getElementById('submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Sending...";
+
+        const summaryContainer = document.getElementById('rsvp-summary');
+        let attendingList = [];
+        let declinedList = [];
+
+        activeGuestData.members.forEach((member, index) => {
+            const status = document.querySelector(`input[name="attendance_${index}"]:checked`).value;
+            if (status === 'attending') {
+                attendingList.push(member);
+            } else {
+                declinedList.push(member);
+            }
+        });
+
+        const message = document.getElementById('decline-message').value;
+
+        // Form confirmation layout
+        let summaryHTML = '<h3>A Gentle Summary:</h3><ul class="summary-list">';
+        if (attendingList.length > 0) {
+            summaryHTML += `<li><strong>Attending:</strong> ${attendingList.join(', ')}</li>`;
+        }
+        if (declinedList.length > 0) {
+            summaryHTML += `<li><strong>Respectfully Declined:</strong> ${declinedList.join(', ')}</li>`;
+        }
+        if (message) {
+            summaryHTML += `<li><strong>A Message Left:</strong> "${message}"</li>`;
+        }
+        summaryHTML += '</ul>';
+        summaryContainer.innerHTML = summaryHTML;
+
+        // Set inputs right before standard transmission
+        document.getElementById('g-primary-guest').value = mainSearchName;
+        document.getElementById('g-attending').value = attendingList.join(", ") || "None";
+        document.getElementById('g-declined').value = declinedList.join(", ") || "None";
+        document.getElementById('g-message').value = message || "No message left";
+
+        switchStep('step-confirmation');
+    }
+
+    function switchStep(stepId) {
+        document.querySelectorAll('.step').forEach(step => {
+            step.classList.remove('active');
+        });
+        
+        const nextStep = document.getElementById(stepId);
+        nextStep.classList.add('active');
+    }
+</script>
+
+</body>
+</html>
