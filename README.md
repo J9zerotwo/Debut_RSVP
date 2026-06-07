@@ -2,7 +2,7 @@
 
 A beautiful, responsive, single-page digital RSVP application designed for **Trisha Jia's 18th Birthday Celebration (A Decade & Eight)**. Built with a classical Bridgerton-inspired theme, this app provides an elegant and intuitive experience for guests to search for their invitation and submit their attendance responses.
 
-Live Demo: [[https://debutrsvp.vercel.app/](https://debutrsvp.vercel.app/)](https://debutrsvp.vercel.app/)
+Live Demo: https://debutrsvp.vercel.app/
 
 ---
 
