@@ -483,7 +483,7 @@
     "marlo abaya, yen abaya, ashton abaya, fiona abaya, alexa abaya": { type: "group", members: ["Marlo Abaya", "Yen Abaya", "Ashton Abaya", "Fiona Abaya", "Alexa Abaya"] },
     "lotlot ordelas, perla ordelas, jaja alviar, marj barnachea, +1 (for nanay)": { type: "group", members: ["Lotlot Ordelas", "Perla Ordelas", "Jaja Alviar", "Marj Barnachea", "1 (for nanay)"] },
     "joseph ordelas, jinky ordelas, ashton ordelas, asha ordelas, asher ordelas": { type: "group", members: ["Joseph Ordelas", "Jinky Ordelas", "Ashton Ordelas", "Asha Ordelas", "Asher Ordelas"] },
-    "olive diza, cecille reyes, jon liban": { type: "group", members: ["Olive Diza", "Cecille Reyes", "Jon Liban"] },
+    "rita soriano, jing alviar, olive diza, cecille reyes, jon liban": { type: "group", members: ["Rita Soriano", "Jing Alviar", "Olive Diza", "Cecille Reyes", "Jon Liban"] },
     "marlon ponce, mariza ponce, brando ponce, martha ponce, edward ponce": { type: "group", members: ["Marlon Ponce", "Mariza Ponce", "Brando Ponce", "Martha Ponce", "Edward Ponce"] },
     "orly bustamante, lorena bustamante, oliver bustamante, anne bustamante, lorrenz bustamante, zandro bayani": { type: "group", members: ["Orly Bustamante", "Lorena Bustamante", "Oliver Bustamante", " Anne Bustamante", "Lorrenz Bustamante", "Zandro Bayani"] },
     "criselda lopez, mar urbano, lilibeth yap, jun yap, pen escobar, marivic romero, arniza urbano": { type: "group", members: ["Criselda Lopez", "Mar Urbano", "Lilibeth Yap", "Jun Yap", "Pen Escobar", "Marivic Romero", "Arniza Urbano"] },
@@ -492,7 +492,8 @@
     "richard fabella": { type: "group", members: ["Richard Fabella"] },
     "nelia moncatar": { type: "group", members: ["Nelia Moncatar"] },
     "yancy moncatar": { type: "group", members: ["Yancy Moncatar"] },
-    "jovy garcia, +1 guest": { type: "group", members: ["Jovy Garcia", "1 Guest"] },
+    "jovy garcia": { type: "group", members: ["Jovy Garcia"] },
+    "bambi jagorin": { type: "group", members: ["Bambi Jagorin"] },
     "aareca legazpi": { type: "group", members: ["Aareca Legazpi"] },
     "miggy fadul": { type: "group", members: ["Miggy Fadul"] },
     "amanda cortez": { type: "group", members: ["Amanda Cortez"] },
@@ -518,7 +519,6 @@
     "marko benson": { type: "group", members: ["Marko Benson"] },
     "mariz de guzman": { type: "group", members: ["Mariz De Guzman"] },
     "sean yalung": { type: "group", members: ["Sean Yalung"] },
-    "sean prado": { type: "group", members: ["Sean Prado"] },
     "trisha lipago": { type: "group", members: ["Trisha Lipago"] },
     "micah antiga": { type: "group", members: ["Micah Antiga"] },
     "zyrrah bigayan": { type: "group", members: ["Zyrrah Bigayan"] },
@@ -590,11 +590,13 @@
                 <div class="guest-name">${member}</div>
                 <div class="radio-options">
                     <label>
-                        <input type="radio" name="attendance_${index}" value="attending" required onclick="checkAttendanceStatus()"> 
+                        <!-- Removed 'required' attribute to allow individual submissions -->
+                        <input type="radio" name="attendance_${index}" value="attending" onclick="checkAttendanceStatus()"> 
                         Attending the Celebration
                     </label>
                     <label>
-                        <input type="radio" name="attendance_${index}" value="declined" required onclick="checkAttendanceStatus()"> 
+                        <!-- Removed 'required' attribute to allow individual submissions -->
+                        <input type="radio" name="attendance_${index}" value="declined" onclick="checkAttendanceStatus()"> 
                         Unable to Join the Celebration
                     </label>
                 </div>
@@ -620,29 +622,46 @@
             messageSection.style.display = 'block';
         } else {
             messageSection.style.display = 'none';
-            messageInput.required = false; // Disable required so submission works when all attend
+            messageInput.required = false; // Disable required so submission works when all attend [3]
             messageInput.value = ''; 
         }
     }
 
     function submitRSVP(event) {
-        // Standard form submit targetting hidden iframe will run naturally
-        const submitBtn = document.getElementById('submit-btn');
-        submitBtn.disabled = true;
-        submitBtn.innerText = "Sending...";
+        // Prevent default submission first to run our validation check
+        event.preventDefault();
 
         const summaryContainer = document.getElementById('rsvp-summary');
         let attendingList = [];
         let declinedList = [];
+        let noResponseList = [];
 
+        // 1. Check if the user selected at least one response
+        let hasSelection = false;
         activeGuestData.members.forEach((member, index) => {
-            const status = document.querySelector(`input[name="attendance_${index}"]:checked`).value;
-            if (status === 'attending') {
-                attendingList.push(member);
+            const checkedRadio = document.querySelector(`input[name="attendance_${index}"]:checked`);
+            if (checkedRadio) {
+                hasSelection = true;
+                const status = checkedRadio.value;
+                if (status === 'attending') {
+                    attendingList.push(member);
+                } else {
+                    declinedList.push(member);
+                }
             } else {
-                declinedList.push(member);
+                noResponseList.push(member);
             }
         });
+
+        // Safeguard: Do not allow completely empty submissions
+        if (!hasSelection) {
+            alert("Please select a response for at least one guest before submitting.");
+            return;
+        }
+
+        const submitBtn = document.getElementById('submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Sending...";
 
         const message = document.getElementById('decline-message').value;
 
@@ -654,6 +673,9 @@
         if (declinedList.length > 0) {
             summaryHTML += `<li><strong>Respectfully Declined:</strong> ${declinedList.join(', ')}</li>`;
         }
+        if (noResponseList.length > 0) {
+            summaryHTML += `<li><strong>No Response Yet:</strong> ${noResponseList.join(', ')}</li>`;
+        }
         if (message) {
             summaryHTML += `<li><strong>A Message Left:</strong> "${message}"</li>`;
         }
@@ -664,7 +686,16 @@
         document.getElementById('g-primary-guest').value = mainSearchName;
         document.getElementById('g-attending').value = attendingList.join(", ") || "None";
         document.getElementById('g-declined').value = declinedList.join(", ") || "None";
-        document.getElementById('g-message').value = message || "No message left";
+
+        // Append any unselected members to the Google Sheets message field so you can see who has not responded yet
+        let finalMessage = message;
+        if (noResponseList.length > 0) {
+            finalMessage += ` (Unresolved/No Response from: ${noResponseList.join(', ')})`;
+        }
+        document.getElementById('g-message').value = finalMessage || "No message left";
+
+        // Programmatically submit the form to the hidden iframe
+        document.getElementById('rsvp-form').submit();
 
         switchStep('step-confirmation');
     }
