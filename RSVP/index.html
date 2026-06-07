@@ -422,7 +422,7 @@
         <button onclick="findGuest()">Access Your Invitation</button>
         
         <!-- REPLACE "YOUR_PREVIEW_LINK_HERE" with your actual link -->
-        <a href="YOUR_PREVIEW_LINK_HERE" class="back-btn" style="margin-top: 15px; display: block; text-align: center;">Preview the Invitation</a>
+        <a href="https://trisha-digital-invitation.vercel.app/" class="back-btn" style="margin-top: 15px; display: block; text-align: center;">Preview the Invitation</a>
     </div>
 
     <!-- STEP 2: Attendance Selection -->
@@ -458,7 +458,7 @@
         <div id="rsvp-summary"></div>
         
         <!-- REPLACE "YOUR_LINK_HERE" with your actual invitation URL -->
-        <a href="YOUR_LINK_HERE" class="back-btn">Back to Invitation</a>
+        <a href="https://trisha-digital-invitation.vercel.app/" class="back-btn">Back to Invitation</a>
     </div>
 </div>
 
@@ -590,11 +590,13 @@
                 <div class="guest-name">${member}</div>
                 <div class="radio-options">
                     <label>
-                        <input type="radio" name="attendance_${index}" value="attending" required onclick="checkAttendanceStatus()"> 
+                        <!-- Removed 'required' attribute to allow individual submissions -->
+                        <input type="radio" name="attendance_${index}" value="attending" onclick="checkAttendanceStatus()"> 
                         Attending the Celebration
                     </label>
                     <label>
-                        <input type="radio" name="attendance_${index}" value="declined" required onclick="checkAttendanceStatus()"> 
+                        <!-- Removed 'required' attribute to allow individual submissions -->
+                        <input type="radio" name="attendance_${index}" value="declined" onclick="checkAttendanceStatus()"> 
                         Unable to Join the Celebration
                     </label>
                 </div>
@@ -620,29 +622,46 @@
             messageSection.style.display = 'block';
         } else {
             messageSection.style.display = 'none';
-            messageInput.required = false; // Disable required so submission works when all attend
+            messageInput.required = false; // Disable required so submission works when all attend [3]
             messageInput.value = ''; 
         }
     }
 
     function submitRSVP(event) {
-        // Standard form submit targetting hidden iframe will run naturally
-        const submitBtn = document.getElementById('submit-btn');
-        submitBtn.disabled = true;
-        submitBtn.innerText = "Sending...";
+        // Prevent default submission first to run our validation check
+        event.preventDefault();
 
         const summaryContainer = document.getElementById('rsvp-summary');
         let attendingList = [];
         let declinedList = [];
+        let noResponseList = [];
 
+        // 1. Check if the user selected at least one response
+        let hasSelection = false;
         activeGuestData.members.forEach((member, index) => {
-            const status = document.querySelector(`input[name="attendance_${index}"]:checked`).value;
-            if (status === 'attending') {
-                attendingList.push(member);
+            const checkedRadio = document.querySelector(`input[name="attendance_${index}"]:checked`);
+            if (checkedRadio) {
+                hasSelection = true;
+                const status = checkedRadio.value;
+                if (status === 'attending') {
+                    attendingList.push(member);
+                } else {
+                    declinedList.push(member);
+                }
             } else {
-                declinedList.push(member);
+                noResponseList.push(member);
             }
         });
+
+        // Safeguard: Do not allow completely empty submissions
+        if (!hasSelection) {
+            alert("Please select a response for at least one guest before submitting.");
+            return;
+        }
+
+        const submitBtn = document.getElementById('submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Sending...";
 
         const message = document.getElementById('decline-message').value;
 
@@ -654,6 +673,9 @@
         if (declinedList.length > 0) {
             summaryHTML += `<li><strong>Respectfully Declined:</strong> ${declinedList.join(', ')}</li>`;
         }
+        if (noResponseList.length > 0) {
+            summaryHTML += `<li><strong>No Response Yet:</strong> ${noResponseList.join(', ')}</li>`;
+        }
         if (message) {
             summaryHTML += `<li><strong>A Message Left:</strong> "${message}"</li>`;
         }
@@ -664,7 +686,16 @@
         document.getElementById('g-primary-guest').value = mainSearchName;
         document.getElementById('g-attending').value = attendingList.join(", ") || "None";
         document.getElementById('g-declined').value = declinedList.join(", ") || "None";
-        document.getElementById('g-message').value = message || "No message left";
+
+        // Append any unselected members to the Google Sheets message field so you can see who has not responded yet
+        let finalMessage = message;
+        if (noResponseList.length > 0) {
+            finalMessage += ` (Unresolved/No Response from: ${noResponseList.join(', ')})`;
+        }
+        document.getElementById('g-message').value = finalMessage || "No message left";
+
+        // Programmatically submit the form to the hidden iframe
+        document.getElementById('rsvp-form').submit();
 
         switchStep('step-confirmation');
     }
